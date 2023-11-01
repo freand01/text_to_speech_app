@@ -1,8 +1,22 @@
 {
     "version": 2,
+    "builds": [
+        {
+            "src": "app.py",
+            "use": "@vercel/python",
+            "config": {
+                "maxLambdaSize": "50mb"
+            }
+        }
+    ],
     "routes": [
         {
-            "src": "/.*",
+            "src": "/",
+            "dest": "app.py"
+        },
+        {
+            "src": "/convert",
+            "methods": ["POST"],
             "dest": "app.py"
         }
     ]

@@ -14,18 +14,13 @@ def convert():
     doc_url = request.form['doc_url']
     
     try:
-        # Hämta texten här (till exempel från ett Google-dokument eller någon annanstans)
         response = requests.get(doc_url)
         response.raise_for_status()
         
-        # För detta exempel, antar vi att innehållet direkt är text
-        # Du kan behöva anpassa detta beroende på hur du får texten
         text_to_convert = response.text
         
-        # Konvertera texten till tal
         tts = gTTS(text=text_to_convert, lang='sv')
         
-        # Spara tal som en bytes-ström snarare än en fysisk fil
         mp3_fp = BytesIO()
         tts.save(mp3_fp)
         mp3_fp.seek(0)

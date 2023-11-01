@@ -1,36 +1,31 @@
-from flask import Flask, request, render_template, send_file
-import requests
-from bs4 import BeautifulSoup
+from flask import Flask, request, Response
 from gtts import gTTS
-from io import BytesIO
+import io
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return '<form method="POST" action="/convert"><input name="text"><button type="submit">Convert</button></form>'
 
 @app.route('/convert', methods=['POST'])
 def convert():
-    doc_url = request.form['doc_url']
+    text = request.form['text']
     
-    try:
-        response = requests.get(doc_url)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        # Anta att vi vill extrahera all text från sidan, du kan anpassa detta baserat på dina behov
-        text_to_convert = soup.get_text()
-        
-        tts = gTTS(text=text_to_convert, lang='sv')
-        
-        mp3_fp = BytesIO()
-        tts.save(mp3_fp)
-        mp3_fp.seek(0)
-        
-        return send_file(mp3_fp, as_attachment=True, download_name="output.mp3", mimetype='audio/mpeg')
+    # Skapa en TTS från texten
+    tts = gTTS(text)
     
-    except Exception as e:
-        return f"Ett fel inträffade: {e}"
+    # Skapa en BytesIO buffer att spara mp3-filen i
+    mp3_fp = io.BytesIO()
+    tts.save(mp3_fp)
+    mp3_fp.seek(0)
+    
+    return send_file(
+        mp3_fp, 
+        as_attachment=True, 
+        download_name='speech.mp3', 
+        mimetype='audio/mp3'
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)
